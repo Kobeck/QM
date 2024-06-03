@@ -49,11 +49,11 @@ with program() as sequence:
         play("cw"* amp(0), "SiV", duration=delay_len)
         reset_phase("SiV")
         play("pi" * amp(amplitude), "SiV",)
+        play("cw"* amp(0), "SiV", duration=delay_len)
     
-    play("cw"* amp(0), "SiV", duration=delay_len)
     reset_phase("SiV")
     play("pi_half" * amp(amplitude), "SiV")
-    
+
     with stream_processing():
         adc_str.input1().save("adc1")
         adc_str.input2().save("adc2")

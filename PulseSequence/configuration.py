@@ -35,7 +35,7 @@ SiV_IF_freq = 3.1e6 #RF Frequency for nuclear spins
 #pulse lenghts
 pulse_len = 1000
 initializazion_len = 3000 * u.ns
-readout_pulse_len = 10000 * u.ns
+readout_pulse_len = 15000 * u.ns
 
 delay_len = 200 * u.ns #time between pi pulses
 pi_half_len = 16 * u.ns

@@ -59,7 +59,7 @@ trigger_delay = 87  # 57ns with QOP222 and above otherwise 87ns
 trigger_buffer = 15  # 18ns with QOP222 and above otherwise 15ns
 detection_delay = 87 
 
-signal_threshold = -2.000 #ADC Units
+signal_threshold = -1.000 #ADC Units
 
 
 octave = "octave1"
@@ -152,6 +152,21 @@ config = {
                 "readout": "readoutPulse",
             },
         },
+        "Meas":{
+            "singleInput": {
+                "port": ("con1", 1)
+            },
+            "outputs": {
+                "out1": ("con1", 1), # output channel 1
+                "out2": ("con1", 2)
+            }, 
+            "time_of_flight":  24,
+            "smearing": 0,
+            "intermediate_frequency": SiV_IF_freq,
+            "operations": {
+                "readout": "readoutPulse2",
+            },
+        }
     },
     "octaves": {
         octave: {
@@ -219,6 +234,12 @@ config = {
             "length": readout_pulse_len,
             "digital_marker": "ON",
             "waveforms": {"I": "readout_wf", "Q": "zero_wf",},
+        },
+        "readoutPulse2":{
+            "operation": "measurement",
+            "length": readout_pulse_len,
+            "digital_marker": "ON",
+            "waveforms": {"single": "zero_wf"},
         },
     },
     "waveforms": {

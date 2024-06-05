@@ -35,24 +35,26 @@ simulate = False
 qm.octave.set_rf_output_gain("SiV", -10)
 with program() as sequence:
     adc_str = declare_stream(adc_trace=True)
-    measure("readout", "signal", adc_str)
+    measure("readout", "Meas", adc_str)
     print(type(adc_str))
     amplitude = 0.5
     
     play("cw" * amp(0), "SiV", duration=delay_len)
 
-    reset_phase("SiV")
-    play("pi_half" * amp(amplitude), "SiV")
-    
+    # reset_phase("SiV")
+    for i in range(100):
+        play(ramp(0.00001), "SiV", duration=5000)
+        play("cw", "SiV", duration=10000)
+
     # 8 pulses
-    for i in range(8):
-        play("cw"* amp(0), "SiV", duration=delay_len)
-        reset_phase("SiV")
-        play("pi" * amp(amplitude), "SiV",)
-        play("cw"* amp(0), "SiV", duration=delay_len)
+    # for i in range(8):
+    #     play("cw"* amp(0), "SiV", duration=delay_len)
+    #     reset_phase("SiV")
+    #     play("pi" * amp(amplitude), "SiV",)
+    #     play("cw"* amp(0), "SiV", duration=delay_len)
     
-    reset_phase("SiV")
-    play("pi_half" * amp(amplitude), "SiV")
+    # reset_phase("SiV")
+    # play("pi_half" * amp(amplitude), "SiV")
 
     with stream_processing():
         adc_str.input1().save("adc1")
@@ -68,26 +70,22 @@ else:
     print('Executing program')
     qm = qmm.open_qm(config)
     job = qm.execute(sequence)
-
+    # time.sleep(10)
     res = job.result_handles
     res.wait_for_all_values()
     job.halt()
-    # fig, (ax1, ax2) = plt.subplots(1, 2)
+    #fig, (ax1, ax2) = plt.subplots(1, 2)
     ax1 = plt.subplot()
     # fig.suptitle("Inputs from down conversion 1")
     adc_1 = u.raw2volts(res.get("adc1").fetch_all())
-    ax1.plot(adc_1, label="Input 1")
+    adc_2 = u.raw2volts(res.get("adc2").fetch_all())
+    ax1.plot(adc_1, 'b', label="Pickup")
     ax1.set_title("amp VS time Input 1")
     ax1.set_xlabel("Time [ns]")
     ax1.set_ylabel("Signal amplitude [V]")
+    ax1.plot(adc_2, 'r', label="Output")
+    ax1.legend()
     plt.show()
-    # adc_2 = u.raw2volts(res.get("adc2").fetch_all())
-    # ax2.plot(adc_2, label="Input 2")
-    # ax2.set_title("amp VS time Input 2")
-    # ax2.set_xlabel("Time [ns]")
-    # ax2.set_ylabel("Signal amplitude [V]")
-    # plt.tight_layout()
-    # plt.show()
     
     
 

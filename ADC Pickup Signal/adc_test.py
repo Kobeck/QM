@@ -49,7 +49,7 @@ with program() as prog:
     #reset_phase("qe1")
     #play("const", "qe1")
     #play("const" * amp(1), "qe1", chirp=(rate, units))
-    play("gauss", "qe1")
+    play("const" * amp(0.5), "qe1")
     play("const" * amp(0), "qe1", duration=1e5)
     #play("const" * amp(0), "qe1")
     #play("gauss" * amp(1), "qe1")

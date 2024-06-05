@@ -17,6 +17,8 @@ import matplotlib.pyplot as plt
 from qualang_tools import units as u
 from configuration import *
 from scipy.fft import fft, ifft, fftfreq
+from scipy.signal import periodogram
+
 
 con = "con1"
 octave = "octave1"
@@ -38,23 +40,22 @@ with program() as sequence:
     measure("readout", "Meas", adc_str)
     print(type(adc_str))
     amplitude = 0.5
-    
+
+
+    # initializazation delay
     play("cw" * amp(0), "SiV", duration=delay_len)
 
-    # reset_phase("SiV")
-    for i in range(100):
-        play(ramp(0.00001), "SiV", duration=5000)
-        play("cw", "SiV", duration=10000)
-
+    reset_phase("SiV")
+    play("pi_half" * amp(amplitude), "SiV")
     # 8 pulses
-    # for i in range(8):
-    #     play("cw"* amp(0), "SiV", duration=delay_len)
-    #     reset_phase("SiV")
-    #     play("pi" * amp(amplitude), "SiV",)
-    #     play("cw"* amp(0), "SiV", duration=delay_len)
+    for i in range(8):
+        play("cw"* amp(0), "SiV", duration=delay_len)
+        reset_phase("SiV")
+        play("pi" * amp(amplitude), "SiV",)
+        play("cw"* amp(0), "SiV", duration=delay_len)
     
-    # reset_phase("SiV")
-    # play("pi_half" * amp(amplitude), "SiV")
+    reset_phase("SiV")
+    play("pi_half" * amp(amplitude), "SiV")
 
     with stream_processing():
         adc_str.input1().save("adc1")
@@ -86,6 +87,3 @@ else:
     ax1.plot(adc_2, 'r', label="Output")
     ax1.legend()
     plt.show()
-    
-    
-

@@ -22,12 +22,11 @@ qmm = QuantumMachinesManager(host=qop_ip, cluster_name=cluster_name)
 ### First example - Linear chirp
 simulate = False
 
-
+amplitude = 0.5
 with program() as prog:
     adc_str = declare_stream(adc_trace=True)
     measure("readout", "signal", adc_str)
-    with infinite_loop_():
-        play("const" * amp(0.5), "AOM")#, duration=1e9 * u.ns)
+    play("const" * amp(amplitude), "AOM") # play one pulse
     with stream_processing():
         adc_str.input1().save("adc1")
         adc_str.input2().save("adc2")

@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 from scipy.signal import periodogram
 def main():
     # Load the raw analog signals from the two CSV files
-    data_signal1 = pd.read_csv('Noise_analysis/noise_direct-line_ao1-to-adc2_adc1_terminated/adc1.csv', header=None)
-    data_signal2 = pd.read_csv('Noise_analysis/noise_direct-line_ao1-to-adc2_adc1_terminated/adc2.csv', header=None)
+    data_signal1 = pd.read_csv('adc1.csv', header=None)
+    data_signal2 = pd.read_csv('adc2.csv', header=None)
 
     # Extract the two signals from the dataframes
     signal1 = data_signal1[0]  # Assuming data is in the first column
@@ -53,7 +53,7 @@ def main():
     fig2, ax3 = plt.subplots()
     ax3.loglog(frequencies_psd1[low_limit:limit1]/1e6 , psd1[low_limit:limit1], label='PSD terminated')
     ax3.loglog(frequencies_psd2[low_limit:limit1]/1e6 , psd2[low_limit:limit1], label='PSD Output')
-    ax3.set_ylim(1e-22, 1e-12)
+    ax3.set_ylim(1e-23, 1e-12)
     ax3.set_title('PSD')
     ax3.set_xlabel('Frequency (MHz)')
     ax3.set_ylabel('PSD')

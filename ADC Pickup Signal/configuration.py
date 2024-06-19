@@ -7,7 +7,7 @@ from qualang_tools.loops import from_array
 from qualang_tools.config.waveform_tools import *
 u = unit(coerce_to_integer=True)
 pulse_duration = 1e5 # in ns 
-readout_pulse_duration = 1e6# in ns
+readout_pulse_duration = 1e7# in ns
 #max pulse length = 2^31-1 = 1e9.3319...
 #possible values in steps of 4 because 4ns = 1clock cycle
 

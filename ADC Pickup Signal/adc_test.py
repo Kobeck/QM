@@ -19,44 +19,19 @@ qop_ip = "192.168.1.106"
 cluster_name = "Cluster_RR_Lab"
 qmm = QuantumMachinesManager(host=qop_ip, cluster_name=cluster_name)
 
-### First example - Linear chirp
 simulate = False
-#pulse_duration = 1e6  # in ns = 1ms
-rate = int(50e6 / pulse_duration) #4MHz in pulse duration
-units = "Hz/nsec"
 
 
 with program() as prog:
-    #
-    #f = declare(int)
-    #with infinite_loop_():
-    #with for_(*from_array(f, f_vec)):
-        #update_frequency("qe1", f)
-        #print("Playing at {f} Hz")
-        #play("const" * amp(1), "qe1", chirp=(rate, units)) #for chirp the pulse duration has to be below 4e7 to work, else it defaults to IF
-        #time.sleep(1e-3)
-    #with infinite_loop_():
+
     adc_st = declare_stream(adc_trace=True)
     
-    #with infinite_loop_():
-    
-    #time.sleep(1e-8)
     
     measure("readout", "signal", adc_st)
-    #wait(25) #25 clock cycles = 100 ns
-
-    play("const" * amp(0), "qe1", duration=1e5)#, duration=1e9 * u.ns)
-    #reset_phase("qe1")
-    #play("const", "qe1")
-    #play("const" * amp(1), "qe1", chirp=(rate, units))
-    play("const" * amp(0.5), "qe1")
-    play("const" * amp(0), "qe1", duration=1e5)
-    #play("const" * amp(0), "qe1")
-    #play("gauss" * amp(1), "qe1")
-    #play("const" * amp(0), "qe1")
-    #play("gauss" * amp(1), "qe1")
-    #play("const" * amp(0), "qe1")
-
+    wait(25) #25 clock cycles = 100 ns
+    play("const" * amp(0), "qe1", duration=1e4)
+    play("const" * amp(0), "qe1")
+    play("const" * amp(0), "qe1")
     
     with stream_processing():
         adc_st.input1().save("adc1")
@@ -64,7 +39,6 @@ with program() as prog:
         adc_st.input1().fft(output="abs").save("adc1_fft")
         adc_st.input2().fft(output="abs").save("adc2_fft")
     
-# The integration weights are, constant, of length 10*4*6 = 240
 if simulate:
     job = qmm.simulate(config, prog, SimulationConfig(int(pulse_duration) // 4))  # duration in clock cycles, 4 ns
     samples = job.get_simulated_samples()
@@ -87,15 +61,16 @@ else:
     res.wait_for_all_values()
 
     #plot results
+    print(type(res.get("adc1")))
     adc1 = u.raw2volts(res.get("adc1").fetch_all())
     adc2 = u.raw2volts(res.get("adc2").fetch_all())
     
     fft1 = res.get("adc1_fft").fetch_all()
     fft2 = res.get("adc2_fft").fetch_all()
-    np.savetxt("C:/Users/admin/QM/adc1.csv", adc1, delimiter=",")
-    np.savetxt("C:/Users/admin/QM/adc2.csv", adc2, delimiter=",")
-    np.savetxt("C:/Users/admin/QM/fft1.csv", fft1, delimiter=",")
-    np.savetxt("C:/Users/admin/QM/fft2.csv", fft2, delimiter=",")
+    np.savetxt("ADC Pickup Signal/adc1.csv", adc1, delimiter=",")
+    np.savetxt("ADC Pickup Signal/adc2.csv", adc2, delimiter=",")
+    np.savetxt("ADC Pickup Signal/fft1.csv", fft1, delimiter=",")
+    np.savetxt("ADC Pickup Signal/fft2.csv", fft2, delimiter=",")
 
     #figures
     fig, ax1= plt.subplots()   

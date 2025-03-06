@@ -27,7 +27,8 @@ with program() as prog:
     
     measure("readout", "signal", adc_st)
     wait(25) #25 clock cycles = 100 ns
-    play("const" * amp(0), "qe1")
+    with infinite_loop_():
+        play("const" * amp(0), "qe1")
     
     with stream_processing():
         adc_st.input1().save("adc1")
@@ -50,16 +51,19 @@ if simulate:
 else:
     qm = qmm.open_qm(config)
     job = qm.execute(prog)
-    res = job.result_handles
-    res.wait_for_all_values()
+    time.sleep(10)
+    job.halt()
 
-    #plot results
-    print(type(res.get("adc1")))
-    adc1 = u.raw2volts(res.get("adc1").fetch_all())
-    adc2 = u.raw2volts(res.get("adc2").fetch_all())
+    # res = job.result_handles
+    # res.wait_for_all_values()
 
-    np.savetxt("adc1.csv", adc1, delimiter=",")
-    np.savetxt("adc2.csv", adc2, delimiter=",")
+    # #plot results
+    # print(type(res.get("adc1")))
+    # adc1 = u.raw2volts(res.get("adc1").fetch_all())
+    # adc2 = u.raw2volts(res.get("adc2").fetch_all())
+
+    # np.savetxt("adc1.csv", adc1, delimiter=",")
+    # np.savetxt("adc2.csv", adc2, delimiter=",")
 
     #figures
     # fig, ax1= plt.subplots()   
@@ -77,5 +81,4 @@ else:
     # fig.legend(["Pickup", "Pulse"])
     # plt.show()
 
-    # time.sleep(10)
-    job.halt()
+    

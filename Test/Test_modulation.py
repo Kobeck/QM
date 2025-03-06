@@ -30,47 +30,10 @@ with program() as prog:
     #counts_stream = declare_stream(adc_trace=True)
     n = declare(int)
 
-    pulse_d = 100 * u.ns
-
-    pause_d = 25 * u.ns
-
-    # pause_d = 400 * u.ns
-    total_length = int(400*1000)
-    total_length_div_loop = int(total_length/1000)
-    shift = 850
-
-    pause_d1 = 100 * u.ns
-    # pulse_d1 = 300 * u.ns
-
-
-
     measure("readout", "signal", adc_str)
     with infinite_loop_():
-       play("const" * amp(amplitude), "AOM", duration=100)
-       play("const" * amp(0), "AOM", duration=30)  
-    
-    # with infinite_loop_():
-    #    play("const" * amp(0), "AOM", duration=pause_d) 
-    #    play("const" * amp(amplitude), "AOM", duration=pulse_d)
-    #    play("const" * amp(0), "AOM", duration=pause_d) 
-    #    play("const" * amp(amplitude), "AOM", duration=pulse_d)
-    #    play("const" * amp(0), "AOM", duration=pause_d1) 
-
-    # # const    
-    
-
-    # with for_(n, 0, n < 1000, n + 1):
-    #     #immer auf 750 insgesamt kommen
-    #     play("zero", "AOM", duration=pause_d1)
-    #     #play("gauss", "AOM") # play one pulse
-    #     play("const"*amp(amplitude), "AOM", duration=pulse_d) # play one pulse
-    #     play("zero", "AOM", duration=pause_d) # play one pulse
-    #     #play("gauss", "AOM") # play one pulse
-    #     play("const"*amp(amplitude), "AOM", duration=pulse_d)
-        # play("zero", "AOM", duration=pause_d1) # play one pulse
-        # play("gauss" , "AOM") # play one pulse in clock cycles [4ns]
-        # play("gauss" , "AOM") # play one pulse in clock cycles [4ns]
-
+        play("const" * amp(amplitude), "AOM", duration=20)
+    #play("const" * amp(0), "AOM", duration=1000) 
 
 
     # gauss
@@ -110,38 +73,29 @@ else:
     job = qm.execute(prog)
     res = job.result_handles
     # res.wait_for_all_values() # needed for not infinite loop measurement
-    time.sleep(600) # needed for infinite loop measurement
+    time.sleep(100) # needed for infinite loop measurement
     job.halt()
-    
 
 
-    fig, axs = plt.subplots(10)
-    # fig, axs = plt.subplots(1)
+    # fig, axs = plt.subplots(10)
+    fig, axs = plt.subplots(1)
     # fig.suptitle("Inputs from down conversion 1")
 
     # Get data and average over the 10 pulses we generated earlier
     adc_1 = u.raw2volts(res.get("adc1").fetch_all())
-    adc_1_cut = adc_1[shift:total_length+shift] #cut the readout pulse
-    data_adc_1 = np.reshape(adc_1_cut, (1000, total_length_div_loop)) #reshape the data to 20 pulses
-    data_avg = np.mean(data_adc_1[1:-1,:], axis=0) #The averaged data of the 1000 pulsen in an array
-    print(len(adc_1_cut))
-    # axs.set_xticks(np.arange(0, total_length_div_loop, step=50))
-    # axs.plot(data_avg) # plot the averaged data
-    # plt.grid(True)
+    adc_2 = u.raw2volts(res.get("adc2").fetch_all())
+    axs.plot(adc_2) # plot the averaged data
+    plt.grid(True)
 
-    pulse_d_ns = int(pulse_d*4)
-    pause_d_ns = int(pause_d*4)    
-    # np.save('data\\Extra_Mara_15_11_2024\\adjust_2025_dl_pro_rect\\after_adjust_2025_pause_d'+str(pause_d_ns)+'pulse_d'+str(pulse_d_ns)+'__readout_length'+str(total_length_div_loop)+'k', data_avg)
-    # rf_length'+str(rf_length)+'__flat_top_l_'+str(flat_length)+
-
+ 
     #adc_str.buffer(int(100e6)).average().save('irgendwieanders')
     # Speichern als Textdatei in das angegebene Verzeichnis
     # np.savetxt('C:\\Users\\admin\\Nextcloud\\nanophotonics (2)\\AOM_Pulses_Mara\\DLPro\\random\\20nspulse_break100ns_onepuls.txt', data_avg)
     #adc_2 = u.raw2volts(res.get("adc2").fetch_all())
  
 # for first 10 plots 
-    for i in range(10):
-        axs[i].plot(data_adc_1[i,:])
+    # for i in range(10):
+    #     axs[i].plot(data_adc_1[i,:])
         # axs[i].set_xticks(np.arange(0, total_length_div_loop, step=50))
         # axs[i].set_xticks(np.arange(0, total_length//20, step=5))
     

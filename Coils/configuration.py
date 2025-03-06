@@ -6,36 +6,22 @@ from qualang_tools.results import progress_counter, fetching_tool
 from qualang_tools.loops import from_array
 from qualang_tools.config.waveform_tools import *
 u = unit(coerce_to_integer=True)
-pulse_duration = 1e5 # in ns 
-readout_pulse_duration = 1e7# in ns
+pulse_duration = 100 # in ns 
+readout_pulse_duration = 500# 1100e3# in ns
 #max pulse length = 2^31-1 = 1e9.3319...
 #possible values in steps of 4 because 4ns = 1clock cycle
 
 # in ns
-IF_freq = 200 * u.MHz # in Hz 5 MHz
-
-drag_len = pulse_duration  # length of pulse in ns
-drag_amp = 0.1  # amplitude of pulse in Volts
-drag_del_f = 3e6  # Detuning frequency in Hz
-drag_alpha = 1  # DRAG coefficient
-drag_delta = -200e6 * 2 * np.pi  # in Hz
+IF_freq = 3 * u.MHz 
 
 
-# DRAG Gaussian envelope:
-drag_gauss_I_wf, drag_gauss_Q_wf = drag_gaussian_pulse_waveforms(drag_amp, drag_len, drag_len / 5, drag_alpha, drag_delta, drag_del_f, subtracted=False)  # pi pulse
+#Gaussian pulse shape
+rf_length = 80 # in ns
+flat_length = 0 #int(pulse_duration - 2 * rf_length) # in ns
 
-# DRAG Cosine envelope:
-drag_cos_I_wf, drag_cos_Q_wf = drag_cosine_pulse_waveforms(drag_amp, drag_len, drag_alpha, drag_delta, drag_del_f)  # pi pulse
-
-# Flattop Cosine
-flattop_cosine = flattop_cosine_waveform(0.2, 100, 5)
-
-rf_length = 100  # in ns
-flat_length = int( pulse_duration - 2 * rf_length)  # in ns
-gauss_pulse_duration = int(2*rf_length + flat_length )
 # Flattop Gaussian
 flattop_gauss = flattop_gaussian_waveform(0.5, flat_length, rf_length)
-
+gauss_pulse_duration = len(flattop_gauss)
 config = {
     "version": 1,
     "controllers": {
@@ -45,21 +31,24 @@ config = {
                 2: {"offset": 0.0, "delay": 0}, 
                 3: {"offset": 0.0, "delay": 0}, 
             },
+            "analog_inputs": {
+                1: {"offset": 0},
+                2: {"offset": 0},
+            },
             "digital_outputs": {
                 1: {},  # AOM/Laser
                 2: {},  # AOM/Laser
                 3: {},  # SPCM1 - indicator
                 4: {},  # SPCM2 - indicator
             },
-            "analog_inputs": {
-                1: {"offset": 0},
-                2: {"offset": 0},
+            'digital_inputs': {
+                1: {'polarity': 'RISING', 'deadtime': 4, "threshold": 0.1},
+                2: {'polarity': 'RISING', 'deadtime': 4, "threshold": 0.1},
             },
-
         },
     },
     "elements": {
-        "qe1": {
+        "Coil": {
             "singleInput": {
                 "port": ("con1", 1)
             },
@@ -84,6 +73,7 @@ config = {
                 "const": "constPulse",
                 "readout": "readout_pulse",
                 "gauss": "gaussPulse",
+                "zero": "zeroPulse",
             },
             "time_of_flight":  24,
             "smearing": 0,
@@ -123,6 +113,11 @@ config = {
             "length": pulse_duration,  # in ns
             "waveforms": {"single": "const_wf"},
         },
+        "zeroPulse": {
+            "operation": "control",
+            "length": pulse_duration,  # in ns
+            "waveforms": {"single": "zero_wf"},
+        },        
         "gaussPulse": {
             "operation": "control",
             "length":  gauss_pulse_duration, # in ns
@@ -141,7 +136,8 @@ config = {
             "sample": 0.0,
         },
         "const_wf": {
-            "type": "constant", "sample": 0.2
+            "type": "constant", 
+            "sample": 0.2,
         },
         "gauss_wf": {
             "type": "arbitrary",
@@ -149,7 +145,7 @@ config = {
         },
         "readout_wf": {
             "type": "constant",
-            "sample": 0.2,
+            "sample": 0.0,
         },
     },
     "digital_waveforms": {

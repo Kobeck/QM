@@ -5,17 +5,17 @@ from scipy.signal import periodogram
 def main():
     # Load the raw analog signals from the two CSV files
     data_signal1 = pd.read_csv('adc1.csv', header=None)
-    # data_signal2 = pd.read_csv('../adc2.csv', header=None)
+    data_signal2 = pd.read_csv('adc2.csv', header=None)
 
     # Extract the two signals from the dataframes
     signal1 = data_signal1[0]  # Assuming data is in the first column
-    # signal2 = data_signal2[0]  # Assuming data is in the first column
+    signal2 = data_signal2[0]  # Assuming data is in the first column
     fs = 1e9  # Sampling frequency of 1 GHz
 
     # Plot the two signals in one figure
     plt.figure(figsize=(10, 6))
     plt.plot(signal1, label='Pickup')
-    # plt.plot(signal2, label='Output')
+    plt.plot(signal2, label='Output')
     plt.xlabel('Time (ns)')
     plt.ylabel('Amplitude [V]')
     plt.title('Analog Signals Analysis')
@@ -25,19 +25,19 @@ def main():
 
     # Calculate and plot the PSD of the signals in one Figure
     frequencies_psd1, psd1 = periodogram(signal1, fs)
-    # frequencies_psd2, psd2 = periodogram(signal2, fs)
+    frequencies_psd2, psd2 = periodogram(signal2, fs)
     
-    # difference = psd1 - psd2[0:len(psd1)]
+    difference = psd1 - psd2[0:len(psd1)]
 
     low_limit=0 #find_index_under_limit(frequencies_psd1, 1e6)
-    limit1 = find_index_under_limit(frequencies_psd1, 500e6)
+    limit1 = find_index_under_limit(frequencies_psd1, 10e6)
 
 
     fig1, (ax1, ax2) = plt.subplots(2, 1, sharex=True, sharey=True)
-    # ratio=psd2/psd1[0:len(psd2)]
+    ratio=psd2/psd1[0:len(psd2)]
     ax1.loglog(frequencies_psd1[low_limit:limit1]/1e6 , psd1[low_limit:limit1], label='PSD Pickup')
     ax1.grid(True)
-    # ax2.loglog(frequencies_psd2[low_limit:limit1]/1e6 , psd2[low_limit:limit1], label='PSD Output')
+    ax2.loglog(frequencies_psd2[low_limit:limit1]/1e6 , psd2[low_limit:limit1], label='PSD Output')
     #plt.plot(frequencies_psd1[low_limit:limit1], ratio[low_limit:limit1], label='ratio')
     #plt.plot(difference[0:limit1]/1e6, label='PSD Signal difference')
     ax1.set_ylim(1e-22, 1e-12)
@@ -52,8 +52,8 @@ def main():
 
     fig2, ax3 = plt.subplots()
     ax3.loglog(frequencies_psd1[low_limit:limit1]/1e6 , psd1[low_limit:limit1], label='PSD terminated')
-    # ax3.loglog(frequencies_psd2[low_limit:limit1]/1e6 , psd2[low_limit:limit1], label='PSD Output')
-    # ax3.set_ylim(1e-23, 1e-12)
+    ax3.loglog(frequencies_psd2[low_limit:limit1]/1e6 , psd2[low_limit:limit1], label='PSD Output')
+    ax3.set_ylim(1e-22, 1e-12)
     ax3.set_title('PSD')
     ax3.set_xlabel('Frequency (MHz)')
     ax3.set_ylabel('PSD')

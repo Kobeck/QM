@@ -6,8 +6,8 @@ from qualang_tools.results import progress_counter, fetching_tool
 from qualang_tools.loops import from_array
 from qualang_tools.config.waveform_tools import *
 u = unit(coerce_to_integer=True)
-pulse_duration = 16 # in ns 
-readout_pulse_duration = 4e2# in ns
+pulse_duration = 5000 # in ns 
+readout_pulse_duration = 6e6# 1100e3# in ns
 #max pulse length = 2^31-1 = 1e9.3319...
 #possible values in steps of 4 because 4ns = 1clock cycle
 
@@ -16,12 +16,12 @@ IF_freq = 200 * u.MHz
 
 
 #Gaussian pulse shape
-rf_length = 4 # in ns
-flat_length = int( pulse_duration - 2 * rf_length)  # in ns
-gauss_pulse_duration = int(2*rf_length + flat_length )
+rf_length = 80 # in ns
+flat_length = 0 #int(pulse_duration - 2 * rf_length) # in ns
+
 # Flattop Gaussian
 flattop_gauss = flattop_gaussian_waveform(0.5, flat_length, rf_length)
-
+gauss_pulse_duration = len(flattop_gauss)
 config = {
     "version": 1,
     "controllers": {
@@ -73,6 +73,7 @@ config = {
                 "const": "constPulse",
                 "readout": "readout_pulse",
                 "gauss": "gaussPulse",
+                "zero": "zeroPulse",
             },
             "time_of_flight":  24,
             "smearing": 0,
@@ -112,6 +113,11 @@ config = {
             "length": pulse_duration,  # in ns
             "waveforms": {"single": "const_wf"},
         },
+        "zeroPulse": {
+            "operation": "control",
+            "length": pulse_duration,  # in ns
+            "waveforms": {"single": "zero_wf"},
+        },        
         "gaussPulse": {
             "operation": "control",
             "length":  gauss_pulse_duration, # in ns
@@ -130,7 +136,8 @@ config = {
             "sample": 0.0,
         },
         "const_wf": {
-            "type": "constant", "sample": 0.2
+            "type": "constant", 
+            "sample": 0.2,
         },
         "gauss_wf": {
             "type": "arbitrary",
@@ -138,7 +145,7 @@ config = {
         },
         "readout_wf": {
             "type": "constant",
-            "sample": 0.2,
+            "sample": 0.0,
         },
     },
     "digital_waveforms": {

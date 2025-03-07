@@ -24,21 +24,8 @@ simulate = False
 
 
 with program() as prog:
+    play("zero" * amp(0.0), "Coil") #0<amp<2 ; 2=+-0.5V = 1Vpp
 
-    adc_st = declare_stream(adc_trace=True)
-    
-    
-    measure("readout", "signal", adc_st)
-
-    with infinite_loop_():
-        play("const" * amp(0.5), "Coil") #0<amp<2 ; 2=+-0.5V = 1Vpp
-    
-    with stream_processing():
-        adc_st.input1().save("adc1")
-        adc_st.input2().save("adc2")
-        adc_st.input1().fft(output="abs").save("adc1_fft")
-        adc_st.input2().fft(output="abs").save("adc2_fft")
-    
 if simulate:
     job = qmm.simulate(config, prog, SimulationConfig(int(pulse_duration) // 4))  # duration in clock cycles, 4 ns
     samples = job.get_simulated_samples()
@@ -57,9 +44,5 @@ else:
     print('Executing program')
     qm = qmm.open_qm(config)
     job = qm.execute(prog)
-    res = job.result_handles
-    #res.wait_for_all_values()
-
-    time.sleep(10800) # in s
     job.halt()
 

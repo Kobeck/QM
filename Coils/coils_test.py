@@ -30,7 +30,7 @@ with program() as prog:
     
     measure("readout", "signal", adc_st)
     wait(25) #25 clock cycles = 100 ns
-    play("const" * amp(1), "Coil") #0<amp<2 ; 2=+-0.5V = 1Vpp
+    play("const" * amp(1), "Coil", duration=100) #0<amp<2 ; 2=+-0.5V = 1Vpp
     
     with stream_processing():
         adc_st.input1().save("adc1")
@@ -79,12 +79,12 @@ else:
     ax1.plot(adc1, label="Pickup")
     
     ax1.tick_params(axis='y', labelcolor='blue')
-    ax2 = ax1.twinx()
+    """ ax2 = ax1.twinx()
     ax2.plot(adc2, label="Pulse", color='orange')
     ax2.tick_params(axis='y', labelcolor='orange')
     ax2.set_ybound(-0.5,0.5)
-    ax1.set_ybound(ax2.get_ybound())
-    fig.legend(["Pickup", "Pulse"])
+    ax1.set_ybound(ax2.get_ybound()) """
+    #fig.legend(["Pickup", "Pulse"])
 
     plt.show()
     #ax2.ylabel("Signal amplitude [V]")

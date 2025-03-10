@@ -1,0 +1,58 @@
+import time
+from qm import QuantumMachinesManager
+from qm.qua import *
+from qm import SimulationConfig
+import numpy as np
+import matplotlib.pyplot as plt
+from configuration import *
+from scipy.fft import fft, ifft, fftfreq
+
+qop_ip = "192.168.1.106"
+cluster_name = "Cluster_RR_Lab"
+qmm = QuantumMachinesManager(host=qop_ip, cluster_name=cluster_name)
+
+### First example - Linear chirp
+simulate = False
+pulse_duration = 1*u.ms  # in ns = 1ms
+lower_limit= 1*u.MHz
+upper_limit= 40*u.MHz
+rate = int(upper_limit / pulse_duration) #4MHz in pulse duration
+units = "Hz/nsec"
+
+with program() as prog:
+    adc_st = declare_stream(adc_trace=True)
+    update_frequency("Coil", lower_limit, units= "Hz") #set initial frequency to lower limit
+    measure("readout", "signal", adc_st)
+    wait(25)
+    play("const" * amp(0.5), "Coil", chirp=(rate, units)) #for chirp the pulse duration has to be below 4e7 to work, else it defaults to IF
+
+    with stream_processing():
+        adc_st.input1().save("adc1")
+        adc_st.input2().save("adc2")
+
+
+print('Executing program')
+qm = qmm.open_qm(config)
+job = qm.execute(prog)
+res = job.result_handles
+res.wait_for_all_values()
+
+print(type(res.get("adc1")))
+adc1 = u.raw2volts(res.get("adc1").fetch_all())
+adc2 = u.raw2volts(res.get("adc2").fetch_all())
+
+np.savetxt("Coils/chirp_data/adc1.csv", adc1, delimiter=",")
+np.savetxt("Coils/chirp_data/adc2.csv", adc2, delimiter=",")
+
+
+#figures
+fig, ax1= plt.subplots()   
+plt.xlabel("Time [ns]")
+plt.title("Single run")
+plt.ylabel("Signal amplitude [V]")
+ax1.plot(adc1, label="Pickup")
+
+ax1.tick_params(axis='y', labelcolor='blue')
+
+plt.show()
+    

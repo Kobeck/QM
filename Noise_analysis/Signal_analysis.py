@@ -39,7 +39,7 @@ def main():
     #frequencies_psd2, psd2 = periodogram(signal2, fs)
     
     # difference = psd1 - psd2[0:len(psd1)]
-=======
+
     print(os.getcwd())
     data_signal1 = pd.read_csv("Noise_analysis/redPitaya/data_file_2021-04-02_03-47-30.csv", header=None)
     print('file read complete')
@@ -67,25 +67,16 @@ def main():
     #frequencies_psd2, psd2 = periodogram(signal2, fs)
     
     #difference = psd1 - psd2[0:len(psd1)]
->>>>>>> d6eb219f484697a053faf4c50fcb35c79285e51f
 
     low_limit=0 #find_index_under_limit(frequencies_psd1, 1e6)
     limit1 = find_index_under_limit(frequencies_psd1, 500e6)
 
 
     fig1, (ax1, ax2) = plt.subplots(2, 1, sharex=True, sharey=True)
-<<<<<<< HEAD
     # ratio=psd2/psd1[0:len(psd2)]
     ax1.loglog(frequencies_psd1[low_limit:limit1]/1e6 , psd1[low_limit:limit1], label='PSD Pickup')
     ax1.grid(True)
     # ax2.loglog(frequencies_psd2[low_limit:limit1]/1e6 , psd2[low_limit:limit1], label='PSD Output')
-=======
-    #ratio=psd2/psd1[0:len(psd2)]
-    ax1.plot(frequencies_psd1[low_limit:limit1]/1e6 , psd1[low_limit:limit1], label='PSD adc1')
-    ax1.plot(True)
-    ax1.grid(True)
-    #ax2.loglog(frequencies_psd2[low_limit:limit1]/1e6 , psd2[low_limit:limit1], label='PSD adc2')
->>>>>>> d6eb219f484697a053faf4c50fcb35c79285e51f
     #plt.plot(frequencies_psd1[low_limit:limit1], ratio[low_limit:limit1], label='ratio')
     #plt.plot(difference[0:limit1]/1e6, label='PSD Signal difference')
     #ax1.set_ylim(1e-22, 1e-12)
@@ -105,15 +96,9 @@ def main():
     plt.show()
 
     fig2, ax3 = plt.subplots()
-<<<<<<< HEAD
     ax3.loglog(frequencies_psd1[low_limit:limit1]/1e6 , psd1[low_limit:limit1], label='PSD terminated')
     # ax3.loglog(frequencies_psd2[low_limit:limit1]/1e6 , psd2[low_limit:limit1], label='PSD Output')
     # ax3.set_ylim(1e-23, 1e-12)
-=======
-    ax3.loglog(frequencies_psd1[low_limit:limit1]/1e6 , psd1[low_limit:limit1], label='PSD adc1')
-    #ax3.loglog(frequencies_psd2[low_limit:limit1]/1e6 , psd2[low_limit:limit1], label='PSD adc2')
-    #ax3.set_ylim(1e-23, 1e-12)
->>>>>>> d6eb219f484697a053faf4c50fcb35c79285e51f
     ax3.set_title('PSD')
     ax3.set_xlabel('Frequency (MHz)')
     ax3.set_ylabel('PSD')
